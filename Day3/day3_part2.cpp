@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#define LEN 12
+
 using std::string, std::vector;
 
 vector<string> parseInput(string path) {
@@ -22,37 +24,16 @@ vector<string> parseInput(string path) {
     return ret;
 }
 
-int getPosOfMax(const string &s) {
+int getPosOfMax(const string &s, const uint8_t from, const uint8_t iter) {
     int pos = -1;
     uint8_t max = 0;
 
-    for (size_t i = 0; i < s.size(); i++) {
-        if (s[i] == '9' && i != s.size() - 1) {
-            return i;
-        }
-
-        uint8_t intVal = s[i] - '0';
-
-        if (intVal > max && i != s.size() - 1) {
-            max = intVal;
-            pos = i;
-        }
-    }
-
-    return pos;
-}
-
-int getPosOfMax2(const string &s, uint from) {
-    int pos = -1;
-    uint8_t max = 0;
-
-    for (size_t i = from; i < s.size(); i++) {
+    for (size_t i = from; i < s.size() - (LEN - iter); i++) {
         if (s[i] == '9') {
             return i;
         }
 
         uint8_t intVal = s[i] - '0';
-
         if (intVal > max) {
             max = intVal;
             pos = i;
@@ -67,11 +48,14 @@ int main(int argc, char *argv[]) {
 
     uint64_t total = 0;
     for (const auto &str : banks) {
-        int maxPos1 = getPosOfMax(str);
-        int maxPos2 = getPosOfMax2(str, maxPos1 + 1);
-
-        string val{str[maxPos1], str[maxPos2]};
-        total += stoull(val);
+        uint8_t from = 0;
+        string value = "";
+        for (size_t i = 1; i <= LEN; i++) {
+            int maxPos = getPosOfMax(str, from, i);
+            value += str[maxPos];
+            from = maxPos + 1;
+        }
+        total += stoull(value);
     }
 
     std::cout << "Total = " << total << std::endl;
